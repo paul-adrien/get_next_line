@@ -16,9 +16,15 @@
 
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdlib.h>
 
-
-char	*ft_strsub(char const *s, unsigned int start, size_t len);
-char	*ft_strdup(const char *src);
 int		get_next_line(const int fd, char **line);
+void		ft_putendl(char const *s);
+char		*ft_strsub(char const *s, unsigned int start, size_t len);
+char		*ft_strnew(size_t s);
+char		*ft_strcpy(char *dest, const char *src);
+char		*ft_strchr(const char *s, int c);
+int		ft_strlen(char *str);
+void		ft_putchar(char c);
+void		ft_putstr(char const *str);
 #endif
