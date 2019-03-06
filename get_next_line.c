@@ -6,14 +6,13 @@
 /*   By: plaurent <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/15 11:16:28 by plaurent          #+#    #+#             */
-/*   Updated: 2018/11/26 22:43:39 by plaurent         ###   ########.fr       */
+/*   Updated: 2019/03/04 17:12:54 by plaurent         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <fcntl.h>
 
-static unsigned int	ft_strtest(char *str)
+static unsigned int	st_length_line(char *str)
 {
 	unsigned int	i;
 
@@ -23,81 +22,51 @@ static unsigned int	ft_strtest(char *str)
 	return (i);
 }
 
-static char			*ft_strjoin2(char *s1, char *s2, size_t size)
+static char			*st_strjoin(char *s1, char *s2)
 {
 	char		*str;
 	int			nb;
-	char		*tmp;
 
-	nb = ft_strlen(s1) + ++size;
-	str = ft_strnew(nb);
-	tmp = str;
-	while (*s1)
-		*str++ = *s1++;
-	while (*s2 && --size > 0)
-		*str++ = *s2++;
-	*str = '\0';
-	return (str - (str - tmp));
+	nb = ft_strlen(s1) + ft_strlen(s2);
+	if (!(str = ft_strnew(nb)))
+		return (NULL);
+	str = ft_strncat(ft_strcpy(str, s1), s2, ft_strlen(s2));
+	free(s1);
+	return (str);
 }
 
-static char			*ft_howcpy(char *str)
+static char			*st_refresh_str(char *str)
 {
 	if (ft_strchr(str, '\n'))
-	{
 		ft_strcpy(str, ft_strchr(str, '\n') + 1);
-		return (str);
-	}
-	if (ft_strtest(str) > 0)
-	{
+	else if (st_length_line(str) > 0)
 		ft_strcpy(str, ft_strchr(str, '\0'));
-		return (str);
-	}
-	return (NULL);
+	else
+		return (NULL);
+	return (str);
 }
 
 int					get_next_line(int const fd, char **line)
 {
 	char		buff[BUFF_SIZE + 1];
-	static char	*str[256];
-	int			res;
-	char		*ptr;
+	static char	*str[1024];
+	int			size;
 
-	if (fd < 0 || BUFF_SIZE < 1 || !line || read(fd, buff, 0) < 0)
-		return (-1);
-	if (!(str[fd]) && (str[fd] = ft_strnew(0)) == NULL)
+	if (fd < 0 || BUFF_SIZE < 1 || !line || read(fd, buff, 0) < 0 ||
+			(!(str[fd]) && (str[fd] = ft_strnew(0)) == NULL))
 		return (-1);
 	while (!(ft_strchr(str[fd], '\n')) &&
-	(res = read(fd, buff, BUFF_SIZE)) > 0)
+	(size = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		buff[res] = '\0';
-		ptr = str[fd];
-		str[fd] = ft_strjoin2(ptr, buff, res);
-		free(ptr);
+		buff[size] = '\0';
+		if (!(str[fd] = st_strjoin(str[fd], buff)))
+			return (-1);
 	}
-	*line = ft_strsub(str[fd], 0, ft_strtest(str[fd]));
-	if (ft_howcpy(str[fd]) == NULL)
+	*line = ft_strsub(str[fd], 0, st_length_line(str[fd]));
+	if (!(st_refresh_str(str[fd])))
+	{
+		ft_strdel(&str[fd]);
 		return (0);
-	return (1);
-}
-
-int		main(int argc, char **argv)
-{
-	int		fd;
-	char	*line;
-
-	if (argc == 1)
-		fd = 0;
-	else if (argc == 2)
-		fd = open(argv[1], O_RDONLY);
-	else
-		return (2);
-	while (get_next_line(fd, &line) == 1)
-	{
-		ft_putendl(line);
-		//ft_putchar('a');
-		free(line);
 	}
-	if (argc == 2)
-		close(fd);
-	return (0);
+	return (1);
 }

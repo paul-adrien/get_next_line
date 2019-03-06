@@ -1,22 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdel.c                                        :+:      :+:    :+:   */
+/*   ft_strnew.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pa <marvin@42.fr>                          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/13 21:11:02 by pa                #+#    #+#             */
-/*   Updated: 2019/03/04 16:03:54 by plaurent         ###   ########.fr       */
+/*   Created: 2018/11/13 21:00:43 by pa                #+#    #+#             */
+/*   Updated: 2018/11/29 10:45:34 by plaurent         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_strdel(char **as)
+char	*ft_strnew(size_t s)
 {
-	if (as)
-	{
-		free(*as);
-		*as = NULL;
-	}
+	char	*str;
+	size_t	i;
+
+	i = 0;
+	str = (char *)malloc(sizeof(char) * (s + 1));
+	if (!str)
+		return (NULL);
+	while (i <= s)
+		str[i++] = '\0';
+	return (str);
 }
